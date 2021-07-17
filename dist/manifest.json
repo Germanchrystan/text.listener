@@ -1,0 +1,13 @@
+{
+    "name": "Text Listener",
+    "manifest_version": 2,
+    "version": "1.0",
+    "content_scripts":[
+        {
+            "matches":[
+                "<all_urls>"
+            ],
+            "js":["content.js"]
+        }
+    ]
+}
