@@ -13,15 +13,15 @@ div.innerHTML =
 `
 <div class="text-listener-bar">
     <div class="text-listener-bar-element">
-        <h1>Text Listener</h1>
+        <h1 class="undesired">Text Listener</h1>
     </div>
     <div class="text-listener-bar-element google">
-        <h1 class="google-h1">Google Selection</h1>
+        <h1 class="google-h1 undesired">Google Selection</h1>
     </div>
 </div>
 <div class="text-listener-display">
-    <h3 class="text-listener-display-indication"></h3>
-    <p class="text-listener-display-text"></p>
+    <h3 class="text-listener-display-indication undesired"></h3>
+    <p class="text-listener-display-text undesired"></p>
 </div>
 `
 
@@ -115,18 +115,10 @@ let displayIndication = document.querySelector('.text-listener-display-indicatio
 let googleSelection = document.querySelector('.google');
 let selection;
 
-//Tags I want removed from the elements array.
-const removedTagNames = ['SCRIPT', 'STYLE', 'CODE', 'svg', 'DIV', 'NOSCRIPT'];
-//Taking all the elements from the body and filtering them.
-let elements = Array.from(document.querySelectorAll('body *')).filter((e) => 
-e.textContent.length > 0 && !removedTagNames.includes(e.tagName) && !e.classList.contains('google-h1')) ;
-//Storing in an Array all the coordinates of the elements
-let elementCoords = elements.map(elt => {
-  let rect = elt.getBoundingClientRect();
-  return [rect.x, rect.y];
-});
-
-
+//Tags I want removed from the hovered element check.
+const removedTagNames = ['SCRIPT', 'STYLE', 'CODE', 'SVG', 'DIV', 'NOSCRIPT'];
+//Tags I want to include when measuring the closest element to the center of the window.
+const desiredTagNames = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'A', 'P', 'SPAN', 'B', 'STRONG']
 //Adding the event that will take the text selection and display it. 
 window.addEventListener('mouseup', wordSelected)
     function wordSelected(){
@@ -146,27 +138,39 @@ document.addEventListener('mousemove', ({x, y}) => {
     let hoveredElement = document.elementFromPoint(x,y);
     //Checking if there is no text being selected
     if(!selectedText.length){
-        //Calculating all the distances between the mouse cursor and the HTML elements.
-        let distances = [];
-        elementCoords.forEach(coord => {
-            let distance = Math.hypot(coord[0]-parseInt(x), coord[1]-parseInt(y));
-            distances.push(parseInt(distance));
-        });
-        //Getting the closest element
-        let closestLinkIndex = distances.indexOf(Math.min(...distances));
-        display.style['display'] = 'block';
         //Checking if there is an element the mouse is hovering over
         if(hoveredElement && 
             hoveredElement.textContent.length && 
             !removedTagNames.includes(hoveredElement.tagName) && 
             !hoveredElement.classList.contains('google-h1')){
-
-            displayIndication.textContent = 'Hovered Text';
-            displayText.textContent = hoveredElement.textContent;
-        } else {
-            //If there isn`t, I display the closest text.
-            displayIndication.textContent = 'Closest Text';
-            displayText.textContent = elements[closestLinkIndex].textContent;
+                
+                display.style['display'] = 'block';
+                displayIndication.textContent = 'Hovered Text';
+                displayText.textContent = hoveredElement.textContent;
+            } else {
+            //Taking all the elements from the body and filtering them.
+            let elements = Array.from(document.querySelectorAll('body *')).filter((e) => 
+            e.textContent.length > 0 && 
+            desiredTagNames.includes(e.tagName) && 
+            !e.classList.contains('undesired')) ;
+            //Storing in an Array all the coordinates of the elements
+            let elementCoords = elements.map(elt => {
+                let rect = elt.getBoundingClientRect();
+                return [rect.x, rect.y];
+            });
+            //Calculating all the distances between the center of the window and the HTML elements.
+            let distances = [];
+            var screenX = window.innerWidth / 2;
+            var screenY = window.innerHeight / 2;
+            elementCoords.forEach(coord => {
+                let distance = Math.hypot(Math.abs(coord[0]-parseInt(screenX)), Math.abs(coord[1]-parseInt(screenY)));
+                distances.push(parseInt(distance));
+            });
+            //Getting the closest element
+            let closestElementIndex = distances.indexOf(Math.min(...distances));
+            elements[closestElementIndex]
+            displayIndication.textContent = 'Closest Text to the center';
+            displayText.textContent = elements[closestElementIndex].textContent;
         }
     }
 })
