@@ -168,7 +168,6 @@ document.addEventListener('mousemove', ({x, y}) => {
             });
             //Getting the closest element
             let closestElementIndex = distances.indexOf(Math.min(...distances));
-            elements[closestElementIndex]
             displayIndication.textContent = 'Closest Text to the center';
             displayText.textContent = elements[closestElementIndex].textContent;
         }
