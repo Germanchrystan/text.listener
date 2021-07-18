@@ -1,7 +1,7 @@
 //================================================================================//
 /*
                         Text Listener
-    Google Chrome Extension coded by Germán Chrystan on July, 17 2021,
+    Google Chrome Extension coded by Germán Chrystan on July, 17th 2021,
             as part of the Consilience Pre-Interview Challenge.
 */
 //================================================================================//
